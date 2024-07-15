@@ -1,3 +1,8 @@
+using Messanger.Hubs;
+using Microsoft.EntityFrameworkCore;
+using TestTaskMessanger.Dbl.Data;
+using TestTaskMessanger.Dbl.Repository;
+
 namespace TestTaskMessanger
 {
     public class Program
@@ -9,15 +14,23 @@ namespace TestTaskMessanger
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddSignalR(opt =>
+            {
+                opt.KeepAliveInterval = TimeSpan.FromMinutes(1);
+            });
+            builder.Services.AddMemoryCache();
+
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json")
+                .Build();
+            
+            builder.Services.AddDbContext<MessangerDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("default")));
+            builder.Services.AddTransient<IMessangerRepository, MessangerRepository>();
 
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-
-            app.UseAuthorization();
-
-
             app.MapControllers();
+            app.MapHub<MessangerHub>("/Messanger");
 
             app.Run();
         }
