@@ -1,6 +1,5 @@
-using Messanger.Hubs;
+using TestTaskMessanger.Hubs;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 using TestTaskMessanger.Dbl.Data;
 using TestTaskMessanger.Dbl.Repository;
 
@@ -29,9 +28,6 @@ namespace TestTaskMessanger
 
             builder.Services.AddDbContext<MessangerDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("default")));
             builder.Services.AddTransient<IMessangerRepository, MessangerRepository>();
-            builder.Services.AddAutoMapper(typeof(MessangerProfile));
-
-
 
             var app = builder.Build();
             app.MapControllers();

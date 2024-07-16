@@ -14,7 +14,6 @@ namespace TestTaskMessanger.Dbl.Data
 
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<ChatEntity> Chats { get; set; }
-        public DbSet<MemberEntity> Members { get; set; }
         public DbSet<MessageEntity> Messages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -28,7 +27,6 @@ namespace TestTaskMessanger.Dbl.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<MemberEntity>().HasKey(member => new {member.UserId, member.ChatId });
             modelBuilder.Entity<MessageEntity>().Property(message => message.SendingTime).HasColumnType("timestamp");
         }
     }
