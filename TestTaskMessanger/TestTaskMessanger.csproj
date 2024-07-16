@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TestTaskMessanger.Dbl\TestTaskMessanger.Dbl.csproj" />
+    <ProjectReference Include="..\TestTaskMessanger.Utils\TestTaskMessanger.Utils.csproj" />
   </ItemGroup>
 
 </Project>

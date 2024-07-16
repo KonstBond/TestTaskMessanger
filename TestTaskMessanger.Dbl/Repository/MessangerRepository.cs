@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System.Data.SqlTypes;
 using TestTaskMessanger.Dbl.Data;
 using TestTaskMessanger.Dbl.Data.Entities;
 using TestTaskMessanger.Dbl.Exceptions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TestTaskMessanger.Dbl.Repository
 {
@@ -17,8 +19,8 @@ namespace TestTaskMessanger.Dbl.Repository
 
         public async Task<bool> AddMessageAsync(string username, string chat, string text)
         {
-            ChatEntity? chatEntity = await GetChatAsync(chat);
-            UserEntity? userEntity = await GetUserAsync(username);
+            var chatEntity = await GetChatAsync(chat);
+            var userEntity = await GetUserAsync(username);
 
             if (chatEntity == null || userEntity == null)
                 return false;
@@ -35,10 +37,28 @@ namespace TestTaskMessanger.Dbl.Repository
             return true;
         }
 
+        public async Task<bool> CreateNewChat(string username, string password, string chat)
+        {
+            var userEntity = await GetUserByPassAsync(username, password);
+            var chatEntity = await GetChatAsync(chat);
+
+            if (chatEntity != null)
+                return false;
+
+            await _dbContext.AddAsync(new ChatEntity
+            {
+                Admin = userEntity,
+                ChatName = chat,
+            });
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<ChatEntity> GetChatAsync(string chat)
         {
             if (!_dbContext.Chats.Any())
-                throw new SqlNullValueException("There are no chats in the database");
+                throw new NpgsqlException("There are no chats in the database");
 
             try
             {
@@ -52,7 +72,7 @@ namespace TestTaskMessanger.Dbl.Repository
         public async Task<UserEntity> GetUserByPassAsync(string username, string password)
         {
             if (!await _dbContext.Users.AnyAsync())
-                throw new SqlNullValueException("There are no users in the database");
+                throw new NpgsqlException("There are no users in the database");
 
             try
             {
@@ -65,5 +85,17 @@ namespace TestTaskMessanger.Dbl.Repository
 
         public async Task<UserEntity> GetUserAsync(string username) =>
             await _dbContext.Users.FirstOrDefaultAsync(user => user.Username == username) ?? throw new NotFoundException("User not Found");
+
+        public async Task<bool> RemoveChatAsync(string chat)
+        {
+            var chatEntity = await GetChatAsync(chat);
+
+            if (chatEntity.ChatName != chat)
+                return false;
+
+            _dbContext.Remove(chatEntity);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }

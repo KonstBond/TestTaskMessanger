@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTaskMessanger", "TestTaskMessanger\TestTaskMessanger.csproj", "{D1D84C33-B592-467C-9218-FC82F0D86D43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTaskMessanger", "TestTaskMessanger\TestTaskMessanger.csproj", "{D1D84C33-B592-467C-9218-FC82F0D86D43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTaskMessanger.Dbl", "TestTaskMessanger.Dbl\TestTaskMessanger.Dbl.csproj", "{794A5B2B-F778-4D5C-8838-503F3B93536C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTaskMessanger.Dbl", "TestTaskMessanger.Dbl\TestTaskMessanger.Dbl.csproj", "{794A5B2B-F778-4D5C-8838-503F3B93536C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTaskMessanger.Utils", "TestTaskMessanger.Utils\TestTaskMessanger.Utils.csproj", "{6EB74973-07DB-4B8C-B478-6A52983247F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{794A5B2B-F778-4D5C-8838-503F3B93536C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{794A5B2B-F778-4D5C-8838-503F3B93536C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{794A5B2B-F778-4D5C-8838-503F3B93536C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EB74973-07DB-4B8C-B478-6A52983247F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EB74973-07DB-4B8C-B478-6A52983247F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EB74973-07DB-4B8C-B478-6A52983247F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EB74973-07DB-4B8C-B478-6A52983247F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
