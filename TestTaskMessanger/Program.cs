@@ -1,5 +1,6 @@
 using Messanger.Hubs;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using TestTaskMessanger.Dbl.Data;
 using TestTaskMessanger.Dbl.Repository;
 
@@ -24,9 +25,13 @@ namespace TestTaskMessanger
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
-            
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             builder.Services.AddDbContext<MessangerDbContext>(opt => opt.UseNpgsql(configuration.GetConnectionString("default")));
             builder.Services.AddTransient<IMessangerRepository, MessangerRepository>();
+            builder.Services.AddAutoMapper(typeof(MessangerProfile));
+
+
 
             var app = builder.Build();
             app.MapControllers();

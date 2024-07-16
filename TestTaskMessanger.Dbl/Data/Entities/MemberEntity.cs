@@ -1,6 +1,6 @@
 ﻿namespace TestTaskMessanger.Dbl.Data.Entities
 {
-    public class Member
+    public class MemberEntity
     {
         public int ChatId { get; set; }
         public ChatEntity? Chat { get; set; }

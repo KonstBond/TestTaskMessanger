@@ -40,7 +40,7 @@ namespace TestTaskMessanger.Dbl.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("Chats");
+                    b.ToTable("Chats", (string)null);
                 });
 
             modelBuilder.Entity("TestTaskMessanger.Dbl.Data.Entities.Member", b =>
@@ -58,7 +58,7 @@ namespace TestTaskMessanger.Dbl.Migrations
 
                     b.HasIndex("ChatId");
 
-                    b.ToTable("Members");
+                    b.ToTable("Members", (string)null);
                 });
 
             modelBuilder.Entity("TestTaskMessanger.Dbl.Data.Entities.MessageEntity", b =>
@@ -88,7 +88,7 @@ namespace TestTaskMessanger.Dbl.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("TestTaskMessanger.Dbl.Data.Entities.UserEntity", b =>
@@ -107,7 +107,7 @@ namespace TestTaskMessanger.Dbl.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("TestTaskMessanger.Dbl.Data.Entities.ChatEntity", b =>
