@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using System.Data.SqlTypes;
 using TestTaskMessanger.Dbl.Data;
 using TestTaskMessanger.Dbl.Data.Entities;
 using TestTaskMessanger.Dbl.Exceptions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TestTaskMessanger.Dbl.Repository
 {
@@ -17,6 +15,20 @@ namespace TestTaskMessanger.Dbl.Repository
             _dbContext = dbContext;
         }
 
+        public async Task<bool> CreateNewUserAsync(string username, string password)
+        {
+            if (await _dbContext.Users.FirstOrDefaultAsync(us => us.Username == username) != null)
+                return false;
+
+            _dbContext.Add(new UserEntity
+            {
+                Username = username,
+                Password = password
+            });
+            _dbContext.SaveChanges();
+            return true;
+        }
+
         public async Task<bool> AddMessageAsync(string username, string chat, string text)
         {
             var chatEntity = await GetChatAsync(chat);
@@ -25,7 +37,7 @@ namespace TestTaskMessanger.Dbl.Repository
             if (chatEntity == null || userEntity == null)
                 return false;
 
-            await _dbContext.AddAsync(new MessageEntity
+            _dbContext.Add(new MessageEntity
             {
                 Chat = chatEntity,
                 Sender = userEntity,
@@ -33,31 +45,30 @@ namespace TestTaskMessanger.Dbl.Repository
                 Text = text
             });
 
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
             return true;
         }
 
-        public async Task<bool> CreateNewChat(string username, string password, string chat)
+        public async Task<bool> CreateNewChatAsync(string username, string password, string chat)
         {
             var userEntity = await GetUserByPassAsync(username, password);
-            var chatEntity = await GetChatAsync(chat);
 
-            if (chatEntity != null)
+            if (await _dbContext.Chats.FirstOrDefaultAsync(ch => ch.ChatName == chat) != null)
                 return false;
 
-            await _dbContext.AddAsync(new ChatEntity
+            _dbContext.Add(new ChatEntity
             {
                 Admin = userEntity,
                 ChatName = chat,
             });
 
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
             return true;
         }
 
         public async Task<ChatEntity> GetChatAsync(string chat)
         {
-            if (!_dbContext.Chats.Any())
+            if (!await _dbContext.Chats.AnyAsync())
                 throw new NpgsqlException("There are no chats in the database");
 
             try
@@ -94,7 +105,7 @@ namespace TestTaskMessanger.Dbl.Repository
                 return false;
 
             _dbContext.Remove(chatEntity);
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
             return true;
         }
     }

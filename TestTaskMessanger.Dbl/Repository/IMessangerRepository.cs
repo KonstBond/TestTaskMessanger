@@ -8,7 +8,8 @@ namespace TestTaskMessanger.Dbl.Repository
         Task<UserEntity> GetUserAsync(string username);
         Task<ChatEntity> GetChatAsync(string chat);
         Task<bool> AddMessageAsync(string username, string chat, string text);
-        Task<bool> CreateNewChat(string username, string password, string chat);
+        Task<bool> CreateNewChatAsync(string username, string password, string chat);
         Task<bool> RemoveChatAsync(string chat);
+        Task<bool> CreateNewUserAsync(string username, string password);
     }
 }

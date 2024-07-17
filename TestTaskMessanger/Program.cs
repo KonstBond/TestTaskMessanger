@@ -2,6 +2,7 @@ using TestTaskMessanger.Hubs;
 using Microsoft.EntityFrameworkCore;
 using TestTaskMessanger.Dbl.Data;
 using TestTaskMessanger.Dbl.Repository;
+using TestTaskMessanger.Utils;
 
 namespace TestTaskMessanger
 {
@@ -14,11 +15,12 @@ namespace TestTaskMessanger
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddMemoryCache();
+            builder.Services.AddSingleton<MesMemoryCache>();
             builder.Services.AddSignalR(opt =>
             {
                 opt.KeepAliveInterval = TimeSpan.FromMinutes(1);
             });
-            builder.Services.AddMemoryCache();
 
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)

@@ -13,19 +13,39 @@ namespace TestTaskMessanger.Hubs
 {
     public class MessangerHub : Hub<IMessangerHub>
     {
-        private readonly IMemoryCache _cache;
+        private readonly MesMemoryCache _cache;
         private readonly IMessangerRepository _repository;
         private readonly ILogger<MessangerHub> _logger;
 
         private const string BOT_RECIEVER = "AdminBot";
 
-        public MessangerHub(IMemoryCache cache, ILogger<MessangerHub> logger, IMessangerRepository repository)
+        public MessangerHub(MesMemoryCache cache, ILogger<MessangerHub> logger, IMessangerRepository repository)
         {
             _cache = cache;
             _logger = logger;
             _repository = repository;
         }
 
+        public async Task CreateUser(UserModel userModel)
+        {
+            try
+            {
+                if (await _repository.CreateNewUserAsync(userModel.Username!, Cipner.Encode(userModel.Password!)))
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Hello in my app, [{userModel.Username}]");
+                else
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User with name: [{userModel.Username}] already exist");
+            }
+            catch (NpgsqlException ex)
+            {
+                await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Problem with Messanger :(");
+                _logger.LogCritical($"{ex.Message}\n{ex.StackTrace}");
+            }
+            catch (NotFoundException ex)
+            {
+                if (ex.Message.Contains("User"))
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User [{userModel.Username}] not found");
+            }
+        }
         public async Task JoinChat(UserConnectionModel userConnectionModel)
         {
             try
@@ -38,29 +58,25 @@ namespace TestTaskMessanger.Hubs
 
                 if (_cache.TryGetValue(Context.ConnectionId, out string? oldChat))
                 {
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You already in chat: {oldChat}");
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You already in chat: [{oldChat}]");
                     return;
                 }
 
-                if (chat != null && username != null)
-                {
-                    await Groups.AddToGroupAsync(Context.ConnectionId, chat!);
-                    _cache.Set(Context.ConnectionId, chat);
-
-                    await Clients.Group(chat!).ReceiveMessage(BOT_RECIEVER, $"{username} has been joined to chat: {chat}");
-                } 
+                await Groups.AddToGroupAsync(Context.ConnectionId, chat!);
+                _cache.Set(Context.ConnectionId, chat);
+                await Clients.Group(chat!).ReceiveMessage(BOT_RECIEVER, $"[{username}] has been joined to chat: [{chat}]");
             }
             catch (NpgsqlException ex)
             {
                 await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Problem with Messanger :(");
-                _logger.LogCritical($"{ex.Message}" + "\n" + $"{ex.StackTrace}");
+                _logger.LogCritical($"{ex.Message}\n{ex.StackTrace}");
             }
             catch (NotFoundException ex)
             {
                 if (ex.Message.Contains("Chat"))
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Chat {userConnectionModel.Chat} not found");
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Chat [{userConnectionModel.Chat}] not found");
                 if (ex.Message.Contains("User"))
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User {userConnectionModel.Username} not found");
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User [{userConnectionModel.Username}] not found");
             }
         }
         public async Task LeaveChat(UserDisconectionModel userDisconectionModel)
@@ -74,8 +90,8 @@ namespace TestTaskMessanger.Hubs
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, chat!);
                     _cache.Remove(Context.ConnectionId);
 
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You left from chat: {chat}");
-                    await Clients.Group(chat!).ReceiveMessage(BOT_RECIEVER, $"{username} has left the chat: {chat}");
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You left from chat: [{chat}]");
+                    await Clients.Group(chat!).ReceiveMessage(BOT_RECIEVER, $"[{username}] has left the chat: [{chat}]");
                 }
                 else
                     await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You're not in any chat");
@@ -83,12 +99,12 @@ namespace TestTaskMessanger.Hubs
             catch (SqlNotFilledException ex)
             {
                 await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Problem with Messanger :(");
-                _logger.LogCritical($"{ex.Message}" + "\n" + $"{ex.StackTrace}");
+                _logger.LogCritical($"{ex.Message}\n{ex.StackTrace}");
             }
             catch (NotFoundException ex)
             {
                 if (ex.Message.Contains("User"))
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User {userDisconectionModel.Username} not found");
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User [{userDisconectionModel.Username}] not found");
             }
         }
         public async Task Send(MessageModel sendingMessageDto)
@@ -111,12 +127,12 @@ namespace TestTaskMessanger.Hubs
             catch (NpgsqlException ex)
             {
                 await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Problem with Messanger :(");
-                _logger.LogCritical($"{ex.Message}" + "\n" + $"{ex.StackTrace}");
+                _logger.LogCritical($"{ex.Message}\n{ex.StackTrace}");
             }
             catch (NotFoundException ex)
             {
                 if (ex.Message.Contains("User"))
-                    await Clients.User(Context.UserIdentifier!).ReceiveMessage(BOT_RECIEVER, $"User {sendingMessageDto.Username} not found");
+                    await Clients.User(Context.UserIdentifier!).ReceiveMessage(BOT_RECIEVER, $"User [{sendingMessageDto.Username}] not found");
             }
         }
         public async Task CreateChat(ChatModel chatModel)
@@ -128,30 +144,30 @@ namespace TestTaskMessanger.Hubs
 
                 if (_cache.TryGetValue(Context.ConnectionId, out string? chat))
                 {
-                    if (await _repository.CreateNewChat(username!, password, chat!))
-                    {
-                        await Groups.AddToGroupAsync(Context.ConnectionId, chat!);
-                        _cache.Set(Context.ConnectionId, chat);
-
-                        await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You have created a new chat \"{chat}\" and you are the admin of this chat");
-                    }
-                    else
-                    {
-                        await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Chat with name \"{chat}\" already created");
-                        return;
-                    }
-
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, chat!);
                     _cache.Remove(Context.ConnectionId);
 
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You left from chat: {chat}");
-                    await Clients.Group(chat!).ReceiveMessage(BOT_RECIEVER, $"{username} has left the chat: {chat}");
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You left from chat: [{chat}]");
+                    await Clients.Group(chat!).ReceiveMessage(BOT_RECIEVER, $"[{username}] has left the chat: [{chat}]");
+                }
+
+                if (await _repository.CreateNewChatAsync(username!, password, chatModel.Chat!))
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, chatModel.Chat!);
+                    _cache.Set(Context.ConnectionId, chatModel.Chat!);
+
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You have created a new chat [{chatModel.Chat!}] and you are the admin of this chat");
+                }
+                else
+                {
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Chat with name [{chatModel.Chat!}] already created");
+                    return;
                 }
             }
             catch (SqlNotFilledException ex)
             {
                 await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Problem with Messanger :(");
-                _logger.LogCritical($"{ex.Message}" + "\n" + $"{ex.StackTrace}");
+                _logger.LogCritical($"{ex.Message}\n{ex.StackTrace}");
             }
             catch (NotFoundException ex)
             {
@@ -163,28 +179,29 @@ namespace TestTaskMessanger.Hubs
         {
             try
             {
-                var username = await _repository.GetUserAsync(chatModel.Username!);
                 string password = Cipner.Encode(chatModel.Password!);
+                var user = await _repository.GetUserByPassAsync(chatModel.Username!, password);
+                var chat = await _repository.GetChatAsync(chatModel.Chat!);
 
-                if (!(await _repository.GetChatAsync(chatModel.Chat!)).Admin!.Equals(username))
+                if (!chat.AdminId.Equals(user.Id))
                 {
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"$You are not admin of chat: {chatModel.Chat}");
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"$You are not admin of chat: [{chat.ChatName!}]");
                     return;
                 }    
 
-                await Clients.Group(chatModel.Chat!).ReceiveMessage(BOT_RECIEVER, $"Chat \"{chatModel.Chat}\" has been deleted by admin");
+                await Clients.Group(chat.ChatName!).ReceiveMessage(BOT_RECIEVER, $"Chat \"{chat.ChatName!}\" has been deleted by admin");
 
-                foreach (var connectionId in _cache.GetKeys<string>())
+                foreach (var connectionId in _cache.GetKeys())
                 {
-                    if (_cache.TryGetValue(connectionId, out string? chat) && chat == chatModel.Chat)
+                    if (_cache.TryGetValue(connectionId, out string? ch) && ch == chat.ChatName!)
                     {
-                        await Groups.RemoveFromGroupAsync(connectionId, chat!);
+                        await Groups.RemoveFromGroupAsync((string)connectionId, ch!);
                         _cache.Remove(connectionId);                        
                     }
                 }
 
-                if (await _repository.RemoveChatAsync(chatModel.Chat!))
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You have deleted chat \"{chatModel.Chat}\"");
+                if (await _repository.RemoveChatAsync(chat.ChatName!))
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"You have deleted chat [{chat.ChatName!}]");
                 else
                     throw new NpgsqlException("Chat not been deleted");
 
@@ -192,12 +209,14 @@ namespace TestTaskMessanger.Hubs
             catch (NpgsqlException ex)
             {
                 await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Problem with Messanger :(");
-                _logger.LogCritical($"{ex.Message}" + "\n" + $"{ex.StackTrace}");
+                _logger.LogCritical($"{ex.Message}\n{ex.StackTrace}");
             }
             catch (NotFoundException ex)
             {
                 if (ex.Message.Contains("User"))
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User {chatModel.Username} not found");
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User [{chatModel.Username}] not found");
+                if (ex.Message.Contains("Chat"))
+                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Chat [{chatModel.Chat}] not found");
             }
         }
     }
