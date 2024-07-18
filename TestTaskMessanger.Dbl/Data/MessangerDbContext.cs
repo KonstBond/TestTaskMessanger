@@ -6,11 +6,9 @@ namespace TestTaskMessanger.Dbl.Data
 {
     public class MessangerDbContext : DbContext
     {
-        private readonly IConfiguration _configuration;
-        public MessangerDbContext(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public MessangerDbContext(DbContextOptions<MessangerDbContext> options)
+            : base(options)
+        { }
 
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<ChatEntity> Chats { get; set; }
@@ -18,11 +16,7 @@ namespace TestTaskMessanger.Dbl.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                var connectionString = _configuration.GetConnectionString("default");
-                optionsBuilder.UseNpgsql(connectionString);
-            }
+            base.OnConfiguring(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
