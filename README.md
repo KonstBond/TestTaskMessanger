@@ -56,7 +56,7 @@ first command for the client and server handshake
 }
 ```
 
-'''CreateChat''' -  method to creating new chat and assigning an administrator to the chat creator.
+```CreateChat``` -  method to creating new chat and assigning an administrator to the chat creator.
 ```
 {
     "type": 1,
@@ -69,7 +69,7 @@ first command for the client and server handshake
 }
 ```
 
-'''DeleteChat''' -  method to delete chat (chat can delete only admin user)
+```DeleteChat``` -  method to delete chat (chat can delete only admin user)
 ```
 {
     "type": 1,
