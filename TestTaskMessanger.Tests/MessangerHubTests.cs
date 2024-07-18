@@ -11,12 +11,13 @@ namespace TestTaskMessanger.Tests
 {
     public class MessangerHubTests
     {
-        private readonly Mock<ILogger<MessangerHub>> _logger;
+        
         private readonly MessangerDbContext _dbContext;
         private readonly MessangerRepository _repository;
         private readonly IMemoryCache _cache;
         private readonly MessangerHub _hub;
 
+        private readonly Mock<ILogger<MessangerHub>> _logger;
         private readonly Mock<IHubCallerClients<IMessangerHub>> _mockClients;
         private readonly Mock<IMessangerHub> _mockCaller;
 
@@ -63,6 +64,23 @@ namespace TestTaskMessanger.Tests
 
             // Assert
             _mockCaller.Verify(caller => caller.ReceiveMessage(It.IsAny<string>(), $"Hello in my app, [{userModel.Username}]"), Times.Once);
+
+        }
+
+        [Fact]
+        public async void CreateNewUserReturnsUserExists()
+        {
+            // Arrange
+            _dbContext.Add(new UserEntity { Username = "ExistsUser" });
+            _dbContext.SaveChanges();
+            var userModel = new UserModel { Username = "ExistsUser", Password = "Pass" };
+
+            // Act
+            await _hub.CreateUser(userModel);
+
+            // Assert
+            _mockCaller.Verify(caller => caller.ReceiveMessage(It.IsAny<string>(), $"User with name: [{userModel.Username}] already exist"), Times.Once);
+
         }
     }
 }
