@@ -40,11 +40,6 @@ namespace TestTaskMessanger.Hubs
                 await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Problem with Messanger :(");
                 _logger.LogCritical($"{ex.Message}\n{ex.StackTrace}");
             }
-            catch (NotFoundException ex)
-            {
-                if (ex.Message.Contains("User"))
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User [{userModel.Username}] not found");
-            }
         }
         public async Task JoinChat(UserConnectionModel userConnectionModel)
         {
