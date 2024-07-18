@@ -7,7 +7,6 @@ using TestTaskMessanger.Dbl.Exceptions;
 using Npgsql;
 using TestTaskMessanger.Models;
 using TestTaskMessanger.Utils;
-using System;
 
 namespace TestTaskMessanger.Hubs
 {

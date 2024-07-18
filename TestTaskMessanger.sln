@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTaskMessanger", "TestTa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTaskMessanger.Dbl", "TestTaskMessanger.Dbl\TestTaskMessanger.Dbl.csproj", "{794A5B2B-F778-4D5C-8838-503F3B93536C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTaskMessanger.Utils", "TestTaskMessanger.Utils\TestTaskMessanger.Utils.csproj", "{6EB74973-07DB-4B8C-B478-6A52983247F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTaskMessanger.Utils", "TestTaskMessanger.Utils\TestTaskMessanger.Utils.csproj", "{6EB74973-07DB-4B8C-B478-6A52983247F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTaskMessanger.Tests", "TestTaskMessanger.Tests\TestTaskMessanger.Tests.csproj", "{6C2C53D8-42D6-4B55-B6C7-EB1A180DD63A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{6EB74973-07DB-4B8C-B478-6A52983247F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EB74973-07DB-4B8C-B478-6A52983247F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EB74973-07DB-4B8C-B478-6A52983247F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C2C53D8-42D6-4B55-B6C7-EB1A180DD63A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C2C53D8-42D6-4B55-B6C7-EB1A180DD63A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C2C53D8-42D6-4B55-B6C7-EB1A180DD63A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C2C53D8-42D6-4B55-B6C7-EB1A180DD63A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
