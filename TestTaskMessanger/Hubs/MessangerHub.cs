@@ -27,23 +27,10 @@ namespace TestTaskMessanger.Hubs
 
         public async Task CreateUser(UserModel userModel)
         {
-            try
-            {
-                if (await _repository.CreateNewUserAsync(userModel.Username!, Cipner.Encode(userModel.Password!)))
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Hello in my app, [{userModel.Username}]");
-                else
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User with name: [{userModel.Username}] already exist");
-            }
-            catch (NpgsqlException ex)
-            {
-                await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Problem with Messanger :(");
-                _logger.LogCritical($"{ex.Message}\n{ex.StackTrace}");
-            }
-            catch (NotFoundException ex)
-            {
-                if (ex.Message.Contains("User"))
-                    await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User [{userModel.Username}] not found");
-            }
+            if (await _repository.CreateNewUserAsync(userModel.Username!, Cipner.Encode(userModel.Password!)))
+                await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"Hello in my app, [{userModel.Username}]");
+            else
+                await Clients.Caller.ReceiveMessage(BOT_RECIEVER, $"User with name: [{userModel.Username}] already exist");
         }
         public async Task JoinChat(UserConnectionModel userConnectionModel)
         {
